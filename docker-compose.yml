@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  allertree:
+    container_name: allertree
+    image: 'registry.richardx.win/allertree:latest'
+    restart: unless-stopped
+    ports:
+      - '3005'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.allertree.rule=Host(`allertree.richardx.win`)
+
+networks:
+  default:
+    name: proxy
+    external: true
