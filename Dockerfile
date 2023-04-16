@@ -1,11 +1,9 @@
-FROM node:18-alpine as pre-yarn
-ENV PYTHONUNBUFFERED=1
-RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
-RUN python3 -m ensurepip
-RUN pip3 install --no-cache --upgrade pip setuptools
-RUN apk add gcc g++ make cmake
-RUN export CXX=g++ CC=gcc
-RUN pip3 install --no-cache wheel lightgbm ultralytics
+FROM node:18-slim as pre-yarn
+RUN apt-get update || : && apt-get install -y \
+    python3-pip \
+    build-essential
+RUN pip3 install --no-cache torch torchvision --index-url https://download.pytorch.org/whl/cpu
+RUN pip3 install --no-cache ultralytics
 WORKDIR /app
 COPY package.json yarn.lock ./
 
