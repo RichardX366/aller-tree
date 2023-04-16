@@ -5,7 +5,6 @@ RUN python3 -m ensurepip
 RUN pip3 install --no-cache --upgrade pip setuptools ultralytics
 WORKDIR /app
 COPY package.json yarn.lock ./
-COPY prisma ./prisma
 
 FROM pre-yarn as pre-install
 COPY .yarnrc.yml ./
