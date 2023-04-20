@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { Configuration, OpenAIApi } from 'openai';
-import { unlink, writeFile, rm } from 'fs/promises';
+import { unlink, writeFile, rmdir, rename, rm } from 'fs/promises';
 import { execSync } from 'child_process';
 
 const configuration = new Configuration({
@@ -16,6 +16,8 @@ export const main: RequestHandler = async (req, res) => {
     .split('\n')[1]
     .trim();
   await unlink(`python/${time}.jpg`);
+  await rename(`runs/detect/predict/${time}.jpg`, `results/${time}.jpg`);
+  await rmdir('runs', { recursive: true });
 
   if (!trees) return res.send('No trees found');
 
@@ -45,6 +47,6 @@ export const main: RequestHandler = async (req, res) => {
 
 export const getImage: RequestHandler = async (req, res) => {
   const { time } = req.params;
-  res.sendFile(`${process.cwd()}/runs/detect/predict/${time}.jpg`);
-  rm('runs/detect/predict', { recursive: true, force: true });
+  res.sendFile(`${process.cwd()}/results/${time}.jpg`);
+  await rm(`results/${time}.jpg`);
 };
