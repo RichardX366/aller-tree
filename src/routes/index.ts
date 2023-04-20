@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { main } from '../controllers';
+import { getImage, main } from '../controllers';
 
 const baseRouter = Router();
 
@@ -8,5 +8,6 @@ baseRouter.get('/', (req, res) => {
 });
 
 baseRouter.post('/', main);
+baseRouter.get('/results/:time', getImage);
 
 export default baseRouter;

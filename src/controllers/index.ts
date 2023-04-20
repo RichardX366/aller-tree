@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { Configuration, OpenAIApi } from 'openai';
-import { unlink, writeFile } from 'fs/promises';
+import { unlink, writeFile, rm } from 'fs/promises';
 import { execSync } from 'child_process';
 
 const configuration = new Configuration({
@@ -13,16 +13,17 @@ export const main: RequestHandler = async (req, res) => {
   await writeFile(`python/${time}.jpg`, req.body.data, 'base64');
   const trees = execSync(`python3 python/main.py python/${time}.jpg`)
     .toString()
+    .split('\n')[1]
     .trim();
   await unlink(`python/${time}.jpg`);
 
   if (!trees) return res.send('No trees found');
 
   let prompt =
-    'Relative to normal pollen amounts, rate the following tree, in which low number (1-3) indicates a low pollen count, while a high number (8-10) indicates a high pollen count: ';
+    'Relative to normal pollen amounts, rate the following tree, in which low number (1-3) indicates a low pollen count, while a high number (8-10) indicates a high pollen count all in json form {"tree":n,"highest":"tree"}: ';
   if (trees.includes(',')) {
     prompt =
-      'Relative to normal pollen amounts, rate the following trees, in which low number (1-3) indicates a low pollen count, while a high number (8-10) indicates a high pollen count, and then also select which of the following tree have the highest or irregular allergenic level: ';
+      'Relative to normal pollen amounts, rate the following trees, in which low number (1-3) indicates a low pollen count, while a high number (8-10) indicates a high pollen count, and then also select which of the following tree have the highest or irregular allergenic level all in json form {"tree":n,"highest":"tree"}: ';
   }
 
   const {
@@ -38,5 +39,12 @@ export const main: RequestHandler = async (req, res) => {
   });
   const message = choices[0].message?.content;
 
-  res.send(message);
+  res.json({ message, time });
+  // Client should then fetch /results/[time]
+};
+
+export const getImage: RequestHandler = async (req, res) => {
+  const { time } = req.params;
+  res.sendFile(`${process.cwd()}/runs/detect/predict/${time}.jpg`);
+  rm('runs/detect/predict', { recursive: true, force: true });
 };

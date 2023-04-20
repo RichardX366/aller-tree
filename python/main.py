@@ -4,7 +4,7 @@ import sys
 classifications = ['magnolia', 'oak', 'palm', 'pine', 'spruce', 'sycamore']
 
 model = YOLO('python/best.pt')
-results = model.predict(sys.argv[1], verbose=False)
+results = model.predict(sys.argv[1], verbose=False, save=True)
 boxes = results[0].numpy().boxes
 trees = set()
 
