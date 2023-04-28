@@ -69,7 +69,7 @@ export const main: RequestHandler = async (req, res) => {
       },
     ],
   });
-  const message = choices[0].message?.content;
+  const message = choices[0].message?.content.split('}')[0] + '}';
   console.log(message);
   res.json({ message, time });
   // Client should then fetch /results/[time]
