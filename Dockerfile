@@ -1,7 +1,5 @@
 FROM node:18-slim as pre-yarn
-RUN apt-get update || : && apt-get install -y \
-    python3-pip \
-    build-essential
+RUN apt-get update || : && apt-get install -y python3-pip build-essential ffmpeg libsm6 libxext6 libgl1-mesa-glx
 RUN pip3 install --no-cache torch torchvision --index-url https://download.pytorch.org/whl/cpu
 RUN pip3 install --no-cache ultralytics
 WORKDIR /app
